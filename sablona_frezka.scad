@@ -11,6 +11,7 @@ h = 20; // height of the milling template
 hf = 4; // height of the inner floor
 
 ds = 4.5; // diameter of the screw hole
+ls = 30; // distance of the screw holes
 
 
 /** CALCULATED PARAMETERS **/
@@ -79,13 +80,13 @@ difference()
     union()
     {
         screw_hole();
-        translate([3*l/4, 0, 0])
+        translate([ls, 0, 0])
             screw_hole();
-        translate([0, 3*l/4, 0])
+        translate([0, ls, 0])
             screw_hole();
-        translate([-3*l/4, 0, 0])
+        translate([-ls, 0, 0])
             screw_hole();
-        translate([0, -3*l/4, 0])
+        translate([0, -ls, 0])
             screw_hole();
     };
 };
