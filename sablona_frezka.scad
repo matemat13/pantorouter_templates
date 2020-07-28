@@ -8,7 +8,9 @@ D = 10; // tool diameter
 aD = 2; // width of the knob will be D+aD
 l = 50; // length of the knob
 h = 20; // height of the milling template
-hf = 1; // height of the inner floor
+hf = 4; // height of the inner floor
+
+ds = 4.5; // diameter of the screw hole
 
 
 /** CALCULATED PARAMETERS **/
@@ -26,7 +28,8 @@ lo = 2*l + 2*D - do; // length of the outer guide
 /** MODULES **/
 module inner_guide()
 {
-    offset(r=-ro) offset(r = -D+ri) // inner and outer fillet
+    offset(r=ri) offset(r=-ri) // outer fillet
+    offset(r=-ro) offset(r = -D+ri) // inner fillet
         union() // the two rectangles, creating the basis of the inner guide
         {
             square([2*w+do, 2*l+do], center = true);
@@ -44,13 +47,45 @@ module outer_guide()
         };
 }
 
+module screw_hole()
+{
+    union()
+    {
+        translate([0, 0, -h-2.5])
+            cylinder(h=h, d=ds, center=false);
+        translate([0, 0, -2.5])
+        cylinder(h=2.5, d1=ds, d2=9, center=false);
+        cylinder(h=h, d=9, center=false);
+    };
+}
+
 
 /** THE OBJECT **/
 difference()
 {
-    //linear_extrude(height = h, scale = 0.9) outer_guide();
-    //translate([0, 0, hf]) linear_extrude(height = h, scale = 0.9) inner_guide();
+    // inner and outer guide
+    difference()
+    {
+        linear_extrude(height = h, scale = 0.9) scale([1/0.9, 1/0.9, 1/0.9]) outer_guide();
+        translate([0, 0, hf])
+            linear_extrude(height = h, scale = 0.9) scale([1/0.9, 1/0.9, 1/0.9]) inner_guide();
+        
+    //    offset(r=-R+ro/2) scale([0.5,0.5]) outer_guide();
+    //    offset(r=+R-ri/2) scale([0.5,0.5]) inner_guide();
+    };
     
-    offset(r=-R+ro/2) scale([0.5,0.5]) outer_guide();
-    offset(r=+R-ri/2) scale([0.5,0.5]) inner_guide();
-}
+    // holes for screws
+    translate([0, 0, hf])
+    union()
+    {
+        screw_hole();
+        translate([3*l/4, 0, 0])
+            screw_hole();
+        translate([0, 3*l/4, 0])
+            screw_hole();
+        translate([-3*l/4, 0, 0])
+            screw_hole();
+        translate([0, -3*l/4, 0])
+            screw_hole();
+    };
+};
